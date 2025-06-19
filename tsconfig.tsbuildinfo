@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/config/db.ts","./src/controllers/authcontroller.ts","./src/middleware/authmiddleware.ts","./src/middleware/errorhandler.ts","./src/middleware/ratelimitermiddleware.ts","./src/models/user.ts","./src/routes/authroutes.ts","./src/routes/healthroutes.ts","./src/utils/apperror.ts","./src/utils/logger.ts"],"version":"5.8.3"}
