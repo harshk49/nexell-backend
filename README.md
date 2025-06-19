@@ -40,6 +40,7 @@ nexell-backend/
 - **Tasks**: Kanban-style task management with status, priority, due dates, assignees
 - **Organizations**: Multi-member workspaces with role-based permissions
 - **Folders**: Organizing notes with organization-aware sharing
+- **Time Tracking**: Timer-based and manual time tracking, linked to tasks and organizations
 
 ## Getting Started
 
@@ -78,6 +79,7 @@ The following documentation is available in the docs folder:
 - [Organization Integration](./docs/organization-integration.md): How organization context works across modules
 - [Notes Pagination & Filtering](./docs/notes-pagination-filtering.md): Notes API pagination and filter options
 - [Password Reset Flow](./docs/password-reset-flow.md): Implementation of secure password reset
+- [Time Tracking](./docs/time-tracking.md): Time tracking system design and implementation
 
 ## API Routes
 
@@ -127,6 +129,18 @@ The following documentation is available in the docs folder:
 - `GET /api/organizations/:id/members`: List organization members
 - `PATCH /api/organizations/:id/members/:userId`: Update member role
 - `DELETE /api/organizations/:id/members/:userId`: Remove member
+
+### Time Tracking
+
+- `POST /api/time-logs/start`: Start a new timer
+- `POST /api/time-logs/stop`: Stop the active timer
+- `GET /api/time-logs/active`: Get the user's active timer
+- `POST /api/time-logs/manual`: Create a manual time entry
+- `GET /api/time-logs`: List time logs with filtering and pagination
+- `GET /api/time-logs/task/:taskId`: Get time logs for a specific task
+- `GET /api/time-logs/statistics`: Get time tracking statistics
+- `PATCH /api/time-logs/:id`: Update a time log
+- `DELETE /api/time-logs/:id`: Delete a time log
 
 ## License
 
