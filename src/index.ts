@@ -2,7 +2,6 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
 import { connectDB, closeDB } from './config/db';
 import { logger, morganMiddleware, loggerMiddleware } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
@@ -10,7 +9,6 @@ import { AppError } from './utils/AppError';
 
 // Import routes
 import healthRoutes from './routes/healthRoutes';
-import authRoutes from './routes/authRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -23,15 +21,11 @@ app.use(helmet()); // Security headers
 app.use(cors()); // CORS handling
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
-app.use(cookieParser()); // Parse cookies
 app.use(morganMiddleware()); // HTTP request logging
 app.use(loggerMiddleware); // Custom logging middleware
 
 // Set up routes
 app.use('/api/health', healthRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/notes', require('./routes/noteRoutes').default);
-app.use('/api/folders', require('./routes/folderRoutes').default);
 
 // Catch 404 and forward to error handler
 app.all('*', (req: Request, _res: Response, next: NextFunction) => {

@@ -4,10 +4,7 @@ import mongoose from 'mongoose';
 export const timeLogValidationRules = {
   // Validation for starting a timer
   startTimer: [
-    body('task')
-      .optional()
-      .isMongoId()
-      .withMessage('Invalid task ID format'),
+    body('task').optional().isMongoId().withMessage('Invalid task ID format'),
     body('startTime')
       .optional()
       .isISO8601()
@@ -34,10 +31,7 @@ export const timeLogValidationRules = {
       .trim()
       .isLength({ min: 1, max: 50 })
       .withMessage('Each tag must be between 1 and 50 characters'),
-    body('organization')
-      .optional()
-      .isMongoId()
-      .withMessage('Invalid organization ID format'),
+    body('organization').optional().isMongoId().withMessage('Invalid organization ID format'),
   ],
 
   // Validation for stopping a timer
@@ -76,10 +70,7 @@ export const timeLogValidationRules = {
 
   // Validation for creating a manual time entry
   createManual: [
-    body('task')
-      .optional()
-      .isMongoId()
-      .withMessage('Invalid task ID format'),
+    body('task').optional().isMongoId().withMessage('Invalid task ID format'),
     body('startTime')
       .exists()
       .withMessage('Start time is required')
@@ -130,21 +121,13 @@ export const timeLogValidationRules = {
       .trim()
       .isLength({ min: 1, max: 50 })
       .withMessage('Each tag must be between 1 and 50 characters'),
-    body('organization')
-      .optional()
-      .isMongoId()
-      .withMessage('Invalid organization ID format'),
+    body('organization').optional().isMongoId().withMessage('Invalid organization ID format'),
   ],
 
   // Validation for updating a time log
   update: [
-    param('id')
-      .isMongoId()
-      .withMessage('Invalid time log ID'),
-    body('task')
-      .optional()
-      .isMongoId()
-      .withMessage('Invalid task ID format'),
+    param('id').isMongoId().withMessage('Invalid time log ID'),
+    body('task').optional().isMongoId().withMessage('Invalid task ID format'),
     body('startTime')
       .optional()
       .isISO8601()
@@ -220,10 +203,7 @@ export const timeLogValidationRules = {
         return true;
       })
       .withMessage('End date must be after start date'),
-    query('taskId')
-      .optional()
-      .isMongoId()
-      .withMessage('Invalid task ID format'),
+    query('taskId').optional().isMongoId().withMessage('Invalid task ID format'),
     query('tag')
       .optional()
       .trim()

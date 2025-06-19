@@ -25,7 +25,8 @@ The TimeLog entity has the following fields:
 
 The time tracking system supports two main modes of time entry:
 
-1. **Timer-Based Tracking**: 
+1. **Timer-Based Tracking**:
+
    - User starts a timer when beginning work
    - Timer runs until explicitly stopped
    - Duration is automatically calculated
@@ -38,12 +39,14 @@ The time tracking system supports two main modes of time entry:
 ### Timer Management Flow
 
 1. **Starting a Timer**:
+
    - Check if user already has an active timer
    - If active timer exists, auto-stop it before starting new timer
    - Create new time log with start time
    - Mark as active
 
 2. **Stopping a Timer**:
+
    - Find user's active timer
    - Set end time (current time or provided time)
    - Calculate duration in seconds
@@ -51,6 +54,7 @@ The time tracking system supports two main modes of time entry:
    - Apply any provided updates (notes, tags)
 
 3. **Manual Time Entry**:
+
    - Validate start and end times (realistic range, start < end)
    - Calculate duration from provided times
    - Create time log marked as inactive
@@ -65,10 +69,12 @@ The time tracking system supports two main modes of time entry:
 Time logs can be associated with an organization context:
 
 1. **Organization Linking**:
+
    - Time logs can be linked to an organization
    - When tracking time on an org task, the org context is automatically set
 
 2. **Permission Model**:
+
    - Users can view/edit their own time logs
    - Organization admins can view aggregated time reports for their org
    - Organization members can see their own time logs within the org
@@ -82,18 +88,22 @@ Time logs can be associated with an organization context:
 The system provides comprehensive filtering capabilities:
 
 1. **Date Range Filtering**:
+
    - Filter by start date range
    - Example: `/api/time-logs?startDate=2023-06-01&endDate=2023-06-30`
 
 2. **Task Filtering**:
+
    - Filter by specific task
    - Example: `/api/time-logs/task/{taskId}`
 
 3. **Tag Filtering**:
+
    - Filter by specific tag
    - Example: `/api/time-logs?tag=meeting`
 
 4. **Active Status Filtering**:
+
    - Filter by active/inactive status
    - Example: `/api/time-logs?active=true`
 
@@ -106,9 +116,11 @@ The system provides comprehensive filtering capabilities:
 The system provides time statistics endpoints:
 
 1. **Total Duration**:
+
    - Total tracked time within a date range
 
 2. **Task Breakdown**:
+
    - Time spent per task
    - Helps identify resource allocation
 
@@ -119,10 +131,12 @@ The system provides time statistics endpoints:
 ## Edge Cases and Safety Mechanisms
 
 1. **Overlapping Timers Prevention**:
+
    - User can only have one active timer
    - Starting a new timer auto-stops any existing timer
 
 2. **Auto-stopping Stale Timers**:
+
    - Timers active for longer than a threshold (e.g., 24 hours) are auto-stopped
    - Prevents erroneous long-duration logs from forgotten timers
 

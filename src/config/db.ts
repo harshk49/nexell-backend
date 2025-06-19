@@ -1,5 +1,10 @@
 import mongoose from 'mongoose';
-import { logger } from '../utils/logger';
+// Temporary logging solution until logger module is fully implemented
+const logger = {
+  info: (message: string) => console.log(`[INFO] ${message}`),
+  error: (message: string) => console.error(`[ERROR] ${message}`),
+  warn: (message: string) => console.warn(`[WARN] ${message}`),
+};
 
 /**
  * Connect to MongoDB database

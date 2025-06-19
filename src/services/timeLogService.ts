@@ -63,7 +63,10 @@ export class TimeLogService {
    * @param updates - Optional updates to apply when stopping the timer
    * @returns The updated time log
    */
-  static async stopTimer(userId: string, updates?: Partial<TimeLogInput>): Promise<ITimeLog | null> {
+  static async stopTimer(
+    userId: string,
+    updates?: Partial<TimeLogInput>
+  ): Promise<ITimeLog | null> {
     const activeTimer = await TimeLog.findOne({ user: userId, isActive: true });
 
     if (!activeTimer) {
@@ -258,16 +261,13 @@ export class TimeLogService {
   ): Promise<ITimeLog[]> {
     // Verify task exists and user has access
     const taskFilter: any = { _id: taskId };
-    
+
     if (orgId) {
-      taskFilter.$or = [
-        { createdBy: userId },
-        { organization: orgId }
-      ];
+      taskFilter.$or = [{ createdBy: userId }, { organization: orgId }];
     } else {
       taskFilter.createdBy = userId;
     }
-    
+
     const task = await Task.findOne(taskFilter);
     if (!task) {
       throw new AppError('Task not found or access denied', 404);
@@ -296,16 +296,13 @@ export class TimeLogService {
   ): Promise<ITimeLog> {
     // Build filter to ensure user owns the time log or it's in their org
     const filter: any = { _id: logId };
-    
+
     if (orgId) {
-      filter.$or = [
-        { user: userId },
-        { organization: orgId }
-      ];
+      filter.$or = [{ user: userId }, { organization: orgId }];
     } else {
       filter.user = userId;
     }
-    
+
     const timeLog = await TimeLog.findOne(filter);
     if (!timeLog) {
       throw new AppError('Time log not found or access denied', 404);
@@ -319,25 +316,29 @@ export class TimeLogService {
       }
 
       // If task has an organization, ensure it matches
-      if (task.organization && timeLog.organization && 
-          task.organization.toString() !== timeLog.organization.toString()) {
+      if (
+        task.organization &&
+        timeLog.organization &&
+        task.organization.toString() !== timeLog.organization.toString()
+      ) {
         throw new AppError('Task must belong to the same organization as the time log', 400);
       }
     }
 
     // If updating start/end times, recalculate duration
-    if ((updates.startTime && timeLog.endTime) || 
-        (updates.endTime && timeLog.startTime) || 
-        (updates.startTime && updates.endTime)) {
-      
+    if (
+      (updates.startTime && timeLog.endTime) ||
+      (updates.endTime && timeLog.startTime) ||
+      (updates.startTime && updates.endTime)
+    ) {
       const start = updates.startTime || timeLog.startTime;
       const end = updates.endTime || timeLog.endTime;
-      
+
       // Make sure end time exists and is after start time
       if (end && end <= start) {
         throw new AppError('End time must be after start time', 400);
       }
-      
+
       if (end) {
         // We need to update the timeLog directly since duration isn't in TimeLogInput type
         timeLog.duration = Math.round((end.getTime() - start.getTime()) / 1000);
@@ -347,7 +348,7 @@ export class TimeLogService {
     // Apply updates
     Object.assign(timeLog, updates);
     await timeLog.save();
-    
+
     return timeLog;
   }
 
@@ -360,18 +361,15 @@ export class TimeLogService {
   static async deleteTimeLog(logId: string, userId: string, orgId?: string): Promise<void> {
     // Build filter to ensure user owns the time log or it's in their org
     const filter: any = { _id: logId };
-    
+
     if (orgId) {
-      filter.$or = [
-        { user: userId },
-        { organization: orgId }
-      ];
+      filter.$or = [{ user: userId }, { organization: orgId }];
     } else {
       filter.user = userId;
     }
-    
+
     const result = await TimeLog.deleteOne(filter);
-    
+
     if (result.deletedCount === 0) {
       throw new AppError('Time log not found or access denied', 404);
     }
@@ -396,21 +394,21 @@ export class TimeLogService {
       // Calculate duration and close the timer
       const endTime = new Date();
       const duration = Math.round((endTime.getTime() - timer.startTime.getTime()) / 1000);
-      
+
       timer.endTime = endTime;
       timer.duration = duration;
       timer.isActive = false;
-      timer.note = timer.note ? 
-        `${timer.note} [Auto-stopped due to inactivity]` : 
-        '[Auto-stopped due to inactivity]';
-      
+      timer.note = timer.note
+        ? `${timer.note} [Auto-stopped due to inactivity]`
+        : '[Auto-stopped due to inactivity]';
+
       await timer.save();
       count++;
     }
 
     return count;
   }
-  
+
   /**
    * Get time summary statistics
    * @param userId - The ID of the user

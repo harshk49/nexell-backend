@@ -14,12 +14,12 @@ export const startTimer = async (
     if (!errors.isEmpty()) {
       throw new AppError('Validation error', 400);
     }
-    
+
     // Add organization from request context if available
     if (req.org) {
       req.body.organization = req.org._id;
     }
-    
+
     const timeLog = await TimeLogService.startTimer(req.user!._id.toString(), req.body);
 
     res.status(201).json({
@@ -31,11 +31,7 @@ export const startTimer = async (
   }
 };
 
-export const stopTimer = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+export const stopTimer = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     // Check for validation errors
     const errors = validationResult(req);
@@ -82,7 +78,7 @@ export const createManualEntry = async (
     if (!errors.isEmpty()) {
       throw new AppError('Validation error', 400);
     }
-    
+
     // Add organization from request context if available
     if (req.org) {
       req.body.organization = req.org._id;
@@ -113,7 +109,7 @@ export const getTimeLogs = async (
 
     const { page, limit, startDate, endDate, taskId, tag } = req.query;
     const orgId = req.org ? req.org._id.toString() : undefined;
-    
+
     const result = await TimeLogService.getTimeLogs(req.user!._id.toString(), {
       page: page ? parseInt(page as string, 10) : undefined,
       limit: limit ? parseInt(limit as string, 10) : undefined,
@@ -198,11 +194,7 @@ export const deleteTimeLog = async (
 ): Promise<void> => {
   try {
     const orgId = req.org ? req.org._id.toString() : undefined;
-    await TimeLogService.deleteTimeLog(
-      req.params.id,
-      req.user!._id.toString(),
-      orgId
-    );
+    await TimeLogService.deleteTimeLog(req.params.id, req.user!._id.toString(), orgId);
 
     res.status(204).json({
       status: 'success',
@@ -221,7 +213,7 @@ export const getTimeStatistics = async (
   try {
     const { startDate, endDate } = req.query;
     const orgId = req.org ? req.org._id.toString() : undefined;
-    
+
     const statistics = await TimeLogService.getTimeStatistics(req.user!._id.toString(), {
       startDate: startDate ? new Date(startDate as string) : undefined,
       endDate: endDate ? new Date(endDate as string) : undefined,
