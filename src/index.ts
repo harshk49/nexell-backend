@@ -30,6 +30,8 @@ app.use(loggerMiddleware); // Custom logging middleware
 // Set up routes
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/notes', require('./routes/noteRoutes').default);
+app.use('/api/folders', require('./routes/folderRoutes').default);
 
 // Catch 404 and forward to error handler
 app.all('*', (req: Request, _res: Response, next: NextFunction) => {
