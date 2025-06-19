@@ -8,6 +8,8 @@ export interface IUser extends Document {
   name: string;
   password: string;
   role: 'admin' | 'member';
+  organizations: mongoose.Types.ObjectId[];
+  defaultOrganization?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
   passwordChangedAt?: Date;
@@ -45,6 +47,16 @@ const userSchema = new Schema<IUser>(
       type: String,
       enum: ['admin', 'member'],
       default: 'member',
+    },
+    organizations: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Organization',
+      },
+    ],
+    defaultOrganization: {
+      type: Schema.Types.ObjectId,
+      ref: 'Organization',
     },
     active: {
       type: Boolean,

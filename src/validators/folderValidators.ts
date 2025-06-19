@@ -9,6 +9,7 @@ export const folderValidationRules = {
       .isLength({ max: 50 })
       .withMessage('Folder name cannot be more than 50 characters')
       .escape(),
+    check('organization').optional().isMongoId().withMessage('Invalid organization ID format'),
   ],
 
   update: [

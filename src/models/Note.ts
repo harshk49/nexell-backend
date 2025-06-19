@@ -5,6 +5,7 @@ export interface INote extends Document {
   content: string;
   user: mongoose.Types.ObjectId;
   folder?: mongoose.Types.ObjectId | null;
+  organization?: mongoose.Types.ObjectId | null;
   tags?: string[];
   createdAt: Date;
   updatedAt: Date;
@@ -34,6 +35,12 @@ const noteSchema = new Schema<INote>(
       ref: 'Folder',
       default: null,
     },
+    organization: {
+      type: Schema.Types.ObjectId,
+      ref: 'Organization',
+      default: null,
+      index: true, // Index to optimize queries by organization
+    },
     tags: {
       type: [String],
       default: [],
@@ -56,6 +63,12 @@ noteSchema.index({ user: 1, title: 1 });
 
 // Create compound index on user + createdAt for listing with sorting
 noteSchema.index({ user: 1, createdAt: -1 });
+
+// Create compound index on organization + createdAt for organization-based sorting
+noteSchema.index({ organization: 1, createdAt: -1 });
+
+// Create compound index on organization + user for faster lookups
+noteSchema.index({ organization: 1, user: 1 });
 
 // No text index - removed text search functionality
 

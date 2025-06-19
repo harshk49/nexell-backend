@@ -180,7 +180,8 @@ export const forgotPassword = async (
 
     res.status(200).json({
       status: 'success',
-      message: 'Token sent to email',
+        message: 'Token sent to email',
+      //TODO Remove it 
       // ONLY FOR DEVELOPMENT/TESTING - remove in production
       token: resetToken,
     });

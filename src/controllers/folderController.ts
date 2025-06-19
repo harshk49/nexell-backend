@@ -15,6 +15,11 @@ export const createFolder = async (
       throw new AppError('Validation error', 400);
     }
 
+    // Add organization from request context if available
+    if (req.org) {
+      req.body.organization = req.org._id;
+    }
+
     const folder = await FolderService.createFolder(req.user!._id.toString(), req.body);
 
     res.status(201).json({
@@ -32,7 +37,8 @@ export const getFolders = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const folders = await FolderService.getFolders(req.user!._id.toString());
+    const orgId = req.org ? req.org._id.toString() : undefined;
+    const folders = await FolderService.getFolders(req.user!._id.toString(), orgId);
 
     res.status(200).json({
       status: 'success',
@@ -49,7 +55,12 @@ export const getFolderById = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const folder = await FolderService.getFolderById(req.params.id, req.user!._id.toString());
+    const orgId = req.org ? req.org._id.toString() : undefined;
+    const folder = await FolderService.getFolderById(
+      req.params.id,
+      req.user!._id.toString(),
+      orgId
+    );
 
     res.status(200).json({
       status: 'success',
@@ -72,10 +83,12 @@ export const updateFolder = async (
       throw new AppError('Validation error', 400);
     }
 
+    const orgId = req.org ? req.org._id.toString() : undefined;
     const folder = await FolderService.updateFolder(
       req.params.id,
       req.user!._id.toString(),
-      req.body
+      req.body,
+      orgId
     );
 
     res.status(200).json({
@@ -94,7 +107,14 @@ export const deleteFolder = async (
 ): Promise<void> => {
   try {
     const { targetFolderId } = req.body;
-    await FolderService.deleteFolder(req.params.id, req.user!._id.toString(), targetFolderId);
+    const orgId = req.org ? req.org._id.toString() : undefined;
+
+    await FolderService.deleteFolder(
+      req.params.id,
+      req.user!._id.toString(),
+      targetFolderId,
+      orgId
+    );
 
     res.status(204).json({
       status: 'success',

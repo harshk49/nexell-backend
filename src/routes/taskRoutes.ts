@@ -1,12 +1,16 @@
 import { Router } from 'express';
 import * as taskController from '../controllers/taskController';
 import { protect } from '../middleware';
+import { extractOrg } from '../middleware/orgMiddleware';
 import { taskValidationRules } from '../validators/taskValidators';
 
 const router = Router();
 
 // All routes require authentication
 router.use(protect);
+
+// Add organization context if provided, but don't require it
+router.use(extractOrg);
 
 // GET /api/tasks - Get all tasks with filtering, sorting, and pagination
 router.get('/', taskValidationRules.queryFilters, taskController.getTasks);

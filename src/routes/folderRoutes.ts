@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import * as folderController from '../controllers/folderController';
 import { protect } from '../middleware';
+import { extractOrg } from '../middleware/orgMiddleware';
 import { folderValidationRules } from '../validators/folderValidators';
 
 const router = Router();
@@ -8,10 +9,13 @@ const router = Router();
 // All routes require authentication
 router.use(protect);
 
-// GET /api/folders - Get all folders
+// Add organization context if provided, but don't require it
+router.use(extractOrg);
+
+// GET /api/folders - Get all folders (personal or in organization context)
 router.get('/', folderController.getFolders);
 
-// POST /api/folders - Create a new folder
+// POST /api/folders - Create a new folder (personal or in organization context)
 router.post('/', folderValidationRules.create, folderController.createFolder);
 
 // GET /api/folders/:id - Get a single folder by ID

@@ -1,6 +1,6 @@
 # Nexell Backend
 
-Backend for a productivity platform combining time tracking, notes, and team collaboration.
+Backend for a productivity platform combining notes, task management, and team collaboration with organization-based sharing.
 
 ## Tech Stack
 
@@ -9,7 +9,7 @@ Backend for a productivity platform combining time tracking, notes, and team col
 - TypeScript
 - MongoDB with Mongoose
 - JWT-based authentication
-- Role-based access control (Admin/Member)
+- Role-based access control
 
 ## Project Structure
 
@@ -22,8 +22,10 @@ nexell-backend/
 │   ├── models/        # Mongoose models
 │   ├── routes/        # API routes
 │   ├── services/      # Business logic
+│   ├── validators/    # Request validation rules
 │   ├── utils/         # Utility functions
 │   └── index.ts       # Application entry point
+├── docs/              # Project documentation
 ├── .env               # Environment variables
 ├── .eslintrc.js       # ESLint configuration
 ├── .prettierrc        # Prettier configuration
@@ -33,13 +35,11 @@ nexell-backend/
 
 ## Core Modules
 
-- User/Auth: Registration, login, profile, password reset
-- Notes: User-scoped CRUD, folders, tags, pagination
-- Tasks: Kanban-style CRUD with status, priority, due dates
-- TimeLogs: Start/stop/manual entries for time tracking
-- Orgs/Teams: Organization and team management
-- Reporting: Time aggregation and exports
-- Activity Feed: Log of key actions
+- **User/Auth**: Registration, login, profile, password reset
+- **Notes**: CRUD operations, rich text, folders, tags, pagination, search
+- **Tasks**: Kanban-style task management with status, priority, due dates, assignees
+- **Organizations**: Multi-member workspaces with role-based permissions
+- **Folders**: Organizing notes with organization-aware sharing
 
 ## Getting Started
 
@@ -70,9 +70,63 @@ nexell-backend/
 - `npm run format`: Format code with Prettier
 - `npm test`: Run tests (when implemented)
 
-## API Documentation
+## Documentation
 
-Once implemented, API documentation will be available at `/api-docs` endpoint using Swagger/OpenAPI.
+The following documentation is available in the docs folder:
+
+- [Task Management](./docs/task-management.md): Details on the kanban task system implementation
+- [Organization Integration](./docs/organization-integration.md): How organization context works across modules
+- [Notes Pagination & Filtering](./docs/notes-pagination-filtering.md): Notes API pagination and filter options
+- [Password Reset Flow](./docs/password-reset-flow.md): Implementation of secure password reset
+
+## API Routes
+
+### Authentication
+
+- `POST /api/auth/register`: Create a new user account
+- `POST /api/auth/login`: Authenticate and receive JWT token
+- `POST /api/auth/forgot-password`: Request password reset email
+- `POST /api/auth/reset-password`: Reset password with token
+- `GET /api/auth/me`: Get current user profile
+
+### Notes
+
+- `GET /api/notes`: List notes with filtering and pagination
+- `POST /api/notes`: Create a new note
+- `GET /api/notes/:id`: Get a note by ID
+- `PATCH /api/notes/:id`: Update a note
+- `DELETE /api/notes/:id`: Delete a note
+
+### Folders
+
+- `GET /api/folders`: List all folders
+- `POST /api/folders`: Create a new folder
+- `GET /api/folders/:id`: Get a folder by ID
+- `PATCH /api/folders/:id`: Update a folder
+- `DELETE /api/folders/:id`: Delete a folder
+
+### Tasks
+
+- `GET /api/tasks`: List tasks with filtering
+- `POST /api/tasks`: Create a new task
+- `GET /api/tasks/:id`: Get a task by ID
+- `PATCH /api/tasks/:id`: Update a task
+- `PATCH /api/tasks/:id/order`: Update a task's order position
+- `POST /api/tasks/rebalance`: Rebalance task order indices
+- `DELETE /api/tasks/:id`: Delete a task
+
+### Organizations
+
+- `GET /api/organizations`: List user's organizations
+- `POST /api/organizations`: Create a new organization
+- `GET /api/organizations/:id`: Get organization details
+- `PATCH /api/organizations/:id`: Update organization details
+- `DELETE /api/organizations/:id`: Delete an organization
+- `POST /api/organizations/join`: Join an organization with invite code
+- `POST /api/organizations/:id/invite`: Generate/regenerate invite code
+- `GET /api/organizations/:id/members`: List organization members
+- `PATCH /api/organizations/:id/members/:userId`: Update member role
+- `DELETE /api/organizations/:id/members/:userId`: Remove member
 
 ## License
 

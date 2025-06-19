@@ -1,12 +1,16 @@
 import { Router } from 'express';
 import * as noteController from '../controllers/noteController';
 import { protect } from '../middleware';
+import { extractOrg } from '../middleware/orgMiddleware';
 import { noteValidationRules } from '../validators/noteValidators';
 
 const router = Router();
 
 // All routes require authentication
 router.use(protect);
+
+// Add organization context if provided, but don't require it
+router.use(extractOrg);
 
 // GET /api/notes - Get all notes with pagination and filtering
 router.get('/', noteController.getNotes);

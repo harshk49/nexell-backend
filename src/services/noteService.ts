@@ -7,6 +7,7 @@ interface NoteInput {
   title: string;
   content: string;
   folder?: string;
+  organization?: string;
   tags?: string[];
 }
 
@@ -18,6 +19,7 @@ interface NotesQueryOptions {
   search?: string;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
+  organization?: string;
 }
 
 export class NoteService {
@@ -25,7 +27,7 @@ export class NoteService {
    * Create a new note for a user
    */
   static async createNote(userId: string, noteInput: NoteInput): Promise<INote> {
-    const { folder, ...rest } = noteInput;
+    const { folder, organization, ...rest } = noteInput;
 
     // Validate folder if provided
     if (folder) {
@@ -39,6 +41,7 @@ export class NoteService {
     const note = await Note.create({
       ...rest,
       folder: folder || null,
+      organization: organization || null,
       user: userId,
     });
 
@@ -46,10 +49,19 @@ export class NoteService {
   }
 
   /**
-   * Get a note by ID, ensuring it belongs to the given user
+   * Get a note by ID, ensuring it belongs to the given user or shared organization
    */
-  static async getNoteById(noteId: string, userId: string): Promise<INote> {
-    const note = await Note.findOne({ _id: noteId, user: userId });
+  static async getNoteById(noteId: string, userId: string, orgId?: string): Promise<INote> {
+    const filter: any = { _id: noteId };
+
+    // If orgId is provided, check for notes in that org, otherwise just check user ownership
+    if (orgId) {
+      filter.$or = [{ user: userId }, { organization: orgId }];
+    } else {
+      filter.user = userId;
+    }
+
+    const note = await Note.findOne(filter);
     if (!note) {
       throw new AppError('Note not found', 404);
     }
@@ -57,14 +69,15 @@ export class NoteService {
   }
 
   /**
-   * Update a note, ensuring it belongs to the given user
+   * Update a note, ensuring it belongs to the given user or shared organization
    */
   static async updateNote(
     noteId: string,
     userId: string,
-    updates: Partial<NoteInput>
+    updates: Partial<NoteInput>,
+    orgId?: string
   ): Promise<INote> {
-    const { folder, ...restUpdates } = updates;
+    const { folder, organization, ...restUpdates } = updates;
 
     // Validate folder if provided
     if (folder) {
@@ -74,28 +87,52 @@ export class NoteService {
       }
     }
 
+    // Build filter based on user and org context
+    const filter: any = { _id: noteId };
+
+    // If organization context is provided
+    if (orgId) {
+      filter.$or = [{ user: userId }, { organization: orgId }];
+    } else {
+      filter.user = userId;
+    }
+
     // Find and update note
     const updatedNote = await Note.findOneAndUpdate(
-      { _id: noteId, user: userId },
-      { ...restUpdates, folder: folder || null },
+      filter,
+      {
+        ...restUpdates,
+        folder: folder || null,
+        organization: organization || undefined, // Only update organization if provided
+      },
       { new: true, runValidators: true }
     );
 
     if (!updatedNote) {
-      throw new AppError('Note not found', 404);
+      throw new AppError('Note not found or you do not have permission to update it', 404);
     }
 
     return updatedNote;
   }
 
   /**
-   * Delete a note, ensuring it belongs to the given user
+   * Delete a note, ensuring it belongs to the given user or shared organization
    */
-  static async deleteNote(noteId: string, userId: string): Promise<void> {
-    const result = await Note.deleteOne({ _id: noteId, user: userId });
+  static async deleteNote(noteId: string, userId: string, orgId?: string): Promise<void> {
+    // Build filter based on user and org context
+    const filter: any = { _id: noteId };
+
+    // If organization context is provided
+    if (orgId) {
+      filter.$or = [{ user: userId }, { organization: orgId }];
+    } else {
+      filter.user = userId;
+    }
+
+    const result = await Note.deleteOne(filter);
 
     if (result.deletedCount === 0) {
-      throw new AppError('Note not found', 404);
+      throw new AppError('Note not found or you do not have permission to delete it', 404);
     }
   }
 
@@ -114,12 +151,25 @@ export class NoteService {
       search,
       sortBy = 'createdAt',
       sortDirection = 'desc',
+      organization,
     } = options;
 
     const skip = (page - 1) * limit;
 
     // Build filter
-    const filter: any = { user: userId };
+    const filter: any = {};
+
+    // If organization context is provided, show notes from organization or user's personal notes
+    if (organization) {
+      filter.$or = [
+        { user: userId, organization: null }, // User's personal notes
+        { organization: organization }, // Organization notes
+      ];
+    } else {
+      // Only show user's personal notes when no organization context
+      filter.user = userId;
+      filter.organization = null;
+    }
 
     // Add folder filter if specified
     if (folder) {

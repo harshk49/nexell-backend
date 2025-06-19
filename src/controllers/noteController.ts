@@ -15,6 +15,11 @@ export const createNote = async (
       throw new AppError('Validation error', 400);
     }
 
+    // Add organization from request context if available
+    if (req.org) {
+      req.body.organization = req.org._id;
+    }
+
     const note = await NoteService.createNote(req.user!._id.toString(), req.body);
 
     res.status(201).json({
@@ -45,6 +50,7 @@ export const getNotes = async (req: Request, res: Response, next: NextFunction):
       search: search as string,
       sortBy: sortBy as string,
       sortDirection: direction,
+      organization: req.org ? req.org._id.toString() : undefined,
     });
 
     res.status(200).json({
@@ -70,7 +76,8 @@ export const getNoteById = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const note = await NoteService.getNoteById(req.params.id, req.user!._id.toString());
+    const orgId = req.org ? req.org._id.toString() : undefined;
+    const note = await NoteService.getNoteById(req.params.id, req.user!._id.toString(), orgId);
 
     res.status(200).json({
       status: 'success',
@@ -93,7 +100,13 @@ export const updateNote = async (
       throw new AppError('Validation error', 400);
     }
 
-    const note = await NoteService.updateNote(req.params.id, req.user!._id.toString(), req.body);
+    const orgId = req.org ? req.org._id.toString() : undefined;
+    const note = await NoteService.updateNote(
+      req.params.id,
+      req.user!._id.toString(),
+      req.body,
+      orgId
+    );
 
     res.status(200).json({
       status: 'success',
@@ -110,7 +123,8 @@ export const deleteNote = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    await NoteService.deleteNote(req.params.id, req.user!._id.toString());
+    const orgId = req.org ? req.org._id.toString() : undefined;
+    await NoteService.deleteNote(req.params.id, req.user!._id.toString(), orgId);
 
     res.status(204).json({
       status: 'success',
